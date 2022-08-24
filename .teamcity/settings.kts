@@ -28,5 +28,8 @@ object Build : BuildType({
         vcs {
         }
     }
+    requirements {
+        contains("teamcity.agent.name", "linux")
+    }
 })
 
