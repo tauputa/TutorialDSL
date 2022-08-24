@@ -11,7 +11,7 @@ project {
     buildType(Build)
 }
 
-object Package : BuildType({
+object Build : BuildType({
     id("Build")
     name = "CleanTest"
     vcs {
