@@ -2,6 +2,7 @@ import jetbrains.buildServer.configs.kotlin.v2019_2.*
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildSteps.maven
 import jetbrains.buildServer.configs.kotlin.v2019_2.triggers.vcs
 import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.Swabra
+import jetbrains.buildServer.configs.kotlin.v2019_2.buildFeatures.swabra
 
 version = "2021.1"
 
@@ -29,10 +30,14 @@ object Build : BuildType({
         vcs {
         }
     }
+
     features {
 	Swabra {                                  // Cleans up files left by the previous build
+            lockingProcesses = Swabra.LockingProcessPolicy.REPORT
+            verbose = true
         }  
     }
+
     requirements {
         contains("teamcity.agent.name", "linux")  // only use agents with linux in theyre name 
 	equals("aws.region", "ap-southeast-2")    // only use agents in ap-southeast-2
