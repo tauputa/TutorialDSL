@@ -29,11 +29,13 @@ object Build : BuildType({
         vcs {
         }
     }
+    features {
+	Swabra {                                  // Cleans up files left by the previous build
+        }  
+    }
     requirements {
         contains("teamcity.agent.name", "linux")  // only use agents with linux in theyre name 
 	equals("aws.region", "ap-southeast-2")    // only use agents in ap-southeast-2
-	Swabra {                                  // Cleans up files left by the previous build
-        }  
     }
 })
 
