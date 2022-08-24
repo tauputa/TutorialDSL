@@ -32,7 +32,7 @@ object Build : BuildType({
     }
 
     features {
-	Swabra {                                  // Cleans up files left by the previous build
+	swabra {                                  // Cleans up files left by the previous build
             lockingProcesses = Swabra.LockingProcessPolicy.REPORT
             verbose = true
         }  
