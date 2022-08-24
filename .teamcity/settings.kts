@@ -30,6 +30,7 @@ object Build : BuildType({
     }
     requirements {
         contains("teamcity.agent.name", "linux")
+	equals("aws.region", "ap-southeast-2")
     }
 })
 
