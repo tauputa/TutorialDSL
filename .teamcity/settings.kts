@@ -21,7 +21,7 @@ project {
         buildType(cleanFiles(agentRequirements(vcsTrigger(Maven("Package","clean package","-Dmaven.test.failure.ignore=true -DskipTests")))))
     }.buildTypes()
     
-    bts.forEach{          // loop over the slice of maven class instances with forEach loops 
+    buildChain.forEach{  // loop over the slice of maven class instances with forEach loops 
         buildType(it)
     }
 }
