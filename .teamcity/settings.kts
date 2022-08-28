@@ -48,6 +48,16 @@ fun agentRequirements(buildType: BuildType): BuildType{
     return buildType
 }
 
+fun cleanFiles(buildType: BuildType): BuildType {
+    buildType.features {
+        swabra {
+            lockingProcesses = Swabra.LockingProcessPolicy.REPORT
+            verbose = true
+        }
+    }
+    return buildType
+}
+
 fun vcsTrigger(buildType: BuildType): BuildType{
     if (buildType.triggers.items.find { it.type == "vcs" } == null ) {
         buildType.triggers {
