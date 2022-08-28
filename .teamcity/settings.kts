@@ -10,16 +10,15 @@ project {
     params {
         param("teamcity.ui.settings.readOnly", "true")
     }
-    val bts = sequential {
-        buildType(Maven("Build","clean compile","-Dmaven.test.failure.ignore=true"))
+
+    // process each object created from the maven class in sequence/parallel
+    sequential {
+        buildType(cleanFiles(agentRequirements(Maven("Build","clean compile","-Dmaven.test.failure.ignore=true"))))
         parallel{
-            buildType(Maven("Unit","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))
-            buildType(Maven("Integration","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))
+          buildType(cleanFiles(agentRequirements(Maven("Unit","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))))
+          buildType(cleanFiles(agentRequirements(Maven("Integration","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))))
         }
-        buildType(Maven("Package","clean package","-Dmaven.test.failure.ignore=true -DskipTests"))
-    }.buildTypes()
-    for (i in bts) {    // this for loop also works nicely too
-        buildType(i)
+        buildType(cleanFiles(agentRequirements( vcsTrigger("Package","clean package","-Dmaven.test.failure.ignore=true -DskipTests"))))
     }
 }
 

@@ -10,28 +10,45 @@ project {
     params {
         param("teamcity.ui.settings.readOnly", "true")
     }
-//    buildType(Build)
-    buildType(cleanFiles(agentRequirements(Build)))
+    val bts = sequential {
+        buildType(Maven("Build","clean compile","-Dmaven.test.failure.ignore=true"))
+        parallel{
+            buildType(Maven("Unit","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))
+            buildType(Maven("Integration","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))
+        }
+        buildType(Maven("Package","clean package","-Dmaven.test.failure.ignore=true -DskipTests"))
+    }.buildTypes()
+    for (i in bts) {    // this for loop also works nicely too
+        buildType(i)
+    }
 }
 
-object Build : BuildType({
-    id("Build")
-    name = "CleanTest"
+class Maven (Name:String,Goals:String,RunnerArgs:String): BuildType({
+    id(Name)
+    this.name=Name
     vcs {
         root(DslContext.settingsRoot)
     }
     steps {
         maven {
-            goals = "clean test"
-            runnerArgs = "-Dmaven.test.failure.ignore=true"
+            this.goals = Goals
+            this.runnerArgs = RunnerArgs
             mavenVersion = bundled_3_6()
         }
     }
-    triggers {
-        vcs {
+})
+
+fun vcsTrigger(buildType: BuildType): BuildType{
+    if (buildType.triggers.items.find { it.type == "vcs" } ==null ) {
+        buildType.triggers {
+            vcs {
+                branchFilter = ""
+                enableQueueOptimization = false
+            }
         }
     }
-})
+    return buildType
+}
 
 fun agentRequirements(buildType: BuildType): BuildType{
     buildType.requirements {
