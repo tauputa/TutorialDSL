@@ -11,14 +11,18 @@ project {
         param("teamcity.ui.settings.readOnly", "true")
     }
 
-    // process each object created from the maven class in sequence/parallel
-    sequential {
+    // create list of each object created from the maven class in sequence/parallel
+    val buildChain = sequential {
         buildType(cleanFiles(agentRequirements(Maven("Build","clean compile","-Dmaven.test.failure.ignore=true"))))
-//        parallel{
-//          buildType(cleanFiles(agentRequirements(Maven("Unit","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))))
-//          buildType(cleanFiles(agentRequirements(Maven("Integration","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))))
-//        }
+        parallel{
+          buildType(cleanFiles(agentRequirements(Maven("Unit","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))))
+          buildType(cleanFiles(agentRequirements(Maven("Integration","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))))
+        }
         buildType(cleanFiles(agentRequirements(vcsTrigger(Maven("Package","clean package","-Dmaven.test.failure.ignore=true -DskipTests")))))
+    }.buildTypes()
+    
+    bts.forEach{          // loop over the slice of maven class instances with forEach loops 
+        buildType(it)
     }
 }
 
