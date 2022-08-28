@@ -10,10 +10,17 @@ project {
     params {
         param("teamcity.ui.settings.readOnly", "true")
     }
-//    buildType(Build)
-//    buildType(cleanFiles(agentRequirements(Build)))
-//    buildType(vcsTrigger(cleanFiles(agentRequirements( Maven("Build","clean compile","-Dmaven.test.failure.ignore=true")))))
-    buildType(vcsTrigger(Maven("Build","clean compile","-Dmaven.test.failure.ignore=true")))
+    val bts = sequential {
+        buildType(Maven("Build","clean compile","-Dmaven.test.failure.ignore=true"))
+        parallel{
+            buildType(Maven("Unit","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))
+            buildType(Maven("Integration","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))
+        }
+        buildType(Maven("Package","clean package","-Dmaven.test.failure.ignore=true -DskipTests"))
+    }.buildTypes()
+    for (i in bts) {    // this for loop also works nicely too
+        buildType(i)
+    }
 }
 
 class Maven (Name:String,Goals:String,RunnerArgs:String): BuildType({
@@ -32,12 +39,30 @@ class Maven (Name:String,Goals:String,RunnerArgs:String): BuildType({
 })
 
 fun vcsTrigger(buildType: BuildType): BuildType{
-    if (buildType.triggers.items.find { it.type == "vcs" } == null ) {
+    if (buildType.triggers.items.find { it.type == "vcs" } ==null ) {
         buildType.triggers {
             vcs {
                 branchFilter = ""
                 enableQueueOptimization = false
             }
+        }
+    }
+    return buildType
+}
+
+fun agentRequirements(buildType: BuildType): BuildType{
+    buildType.requirements {
+        contains("teamcity.agent.name", "linux")
+        equals("aws.region", "ap-southeast-2")
+    }
+    return buildType
+}
+
+fun cleanFiles(buildType: BuildType): BuildType {
+    buildType.features {
+        swabra {
+            lockingProcesses = Swabra.LockingProcessPolicy.REPORT
+            verbose = true
         }
     }
     return buildType
