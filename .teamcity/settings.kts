@@ -4,8 +4,8 @@ project {
         param("teamcity.ui.settings.readOnly", "true")
     }
 //    buildType(Build)
-//    buildType(cleanFiles(agentRequirements(Build)))
-    buildType(cleanFiles(agentRequirements( Maven("Build","clean compile","-Dmaven.test.failure.ignore=true"))))
+    buildType(cleanFiles(agentRequirements(Build)))
+//    buildType(cleanFiles(agentRequirements( Maven("Build","clean compile","-Dmaven.test.failure.ignore=true"))))
 }
 
 class Maven (Name:String,Goals:String,RunnerArgs:String): BuildType({
