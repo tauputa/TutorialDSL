@@ -12,7 +12,7 @@ project {
     }
 //    buildType(Build)
 //    buildType(cleanFiles(agentRequirements(Build)))
-    buildType(cleanFiles(agentRequirements( Maven("Build","clean compile","-Dmaven.test.failure.ignore=true"))))
+    buildType(vcsTrigger(cleanFiles(agentRequirements( Maven("Build","clean compile","-Dmaven.test.failure.ignore=true")))))
 }
 
 class Maven (Name:String,Goals:String,RunnerArgs:String): BuildType({
@@ -29,6 +29,16 @@ class Maven (Name:String,Goals:String,RunnerArgs:String): BuildType({
         }
     }
 })
+
+fun vcsTrigger(buildType: BuildType): BuildType{
+    buildType.triggers {
+        vcs {
+            branchFilter = ""
+            enableQueueOptimization = false
+        }
+    }
+    return buildType
+}
 
 fun agentRequirements(buildType: BuildType): BuildType{
     buildType.requirements {
