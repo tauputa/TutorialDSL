@@ -18,7 +18,7 @@ project {
           buildType(cleanFiles(agentRequirements(Maven("Unit","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.unit.*Test"))))
           buildType(cleanFiles(agentRequirements(Maven("Integration","clean test","-Dmaven.test.failure.ignore=true -Dtest=*.integration.*Test"))))
         }
-        buildType(cleanFiles(agentRequirements( vcsTrigger("Package","clean package","-Dmaven.test.failure.ignore=true -DskipTests"))))
+        buildType(cleanFiles(agentRequirements(vcsTrigger(Maven("Package","clean package","-Dmaven.test.failure.ignore=true -DskipTests")))))
     }
 }
 
